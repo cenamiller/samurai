@@ -27,6 +27,8 @@ public:
 
 private:
 	bool outputAnalysis(const std::string& suffix, real* Astate);
+	bool validationAnalysis(const std::string& suffix, real* Astate);
+	double calculateRMSE(const std::string& validationFile, const std::string& analysisFile, const std::vector<std::string>& variables);
 	bool writeAsi(const std::string& asiFileName);
 	bool writeNetCDF(const std::string& netcdfFileName);
 	bool SItransform(size_t numVars, double *finalAnalysis, double *mishData, real *Astate, ofstream *outStream);

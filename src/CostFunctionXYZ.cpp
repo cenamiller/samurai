@@ -499,6 +499,89 @@ bool CostFunctionXYZ::SItransform(size_t numVars, double *finalAnalysis, double 
   return true;
 }
 
+double CostFunctionXYZ::calculateRMSE(const std::string& validationFile, const std::string& analysisFile, const std::vector<std::string>& variables) {
+   
+    std::ifstream validationStream(validationFile);
+    std::ifstream analysisStream(analysisFile);
+
+
+    std::map<std::string, std::vector<double>> validationData;
+    std::map<std::string, std::vector<double>> analysisData;
+
+    // Assuming the first line of each file contains the variable names
+    std::string line;
+    std::getline(validationStream, line);
+    std::getline(analysisStream, line);
+
+    // Read data from validation file
+    while (std::getline(validationStream, line)) {
+        std::istringstream iss(line);
+        for (const auto& var : variables) {
+            double value;
+            iss >> value;
+            validationData[var].push_back(value);
+        }
+    }
+
+    // Read data from analysis file
+    while (std::getline(analysisStream, line)) {
+        std::istringstream iss(line);
+        for (const auto& var : variables) {
+            double value;
+            iss >> value;
+            analysisData[var].push_back(value);
+        }
+    }
+
+    double sumOfSquares = 0.0;
+    int count = 0;
+
+    for (const auto& var : variables) {
+        auto& valData = validationData[var];
+        auto& anData = analysisData[var];
+
+        for (size_t i = 0; i < valData.size() && i < anData.size(); ++i) {
+            double diff = valData[i] - anData[i];
+            sumOfSquares += diff * diff;
+            ++count;
+        }
+    }
+
+    if (count == 0) {
+        std::cerr << "No matching data found" << std::endl;
+        return -1.0;
+    }
+
+    return std::sqrt(sumOfSquares / count);
+}
+
+bool CostFunctionXYZ::validationAnalysis(const std::string& suffix, real* Astate)
+{
+  std::string samuraiVal = "samurai_XYZ_" + suffix + ".out";
+  std::string samuraiAnalsis = "samurai_XYZ_analysis.out";
+
+
+  if (!samuraiValStream) {
+    std::cerr << "Unable to open file " << samuraiVal << std::endl;
+    return false;
+  }
+
+  if (!samuraiAnalysisStream) {
+        std::cerr << "Unable to open file " << samuraiAnalsis << std::endl;
+        return false;
+    }
+
+    calculateRMSE(samuraiVal, samuraiAnalsis, {"u", "v", "w", "Vorticity", "Divergence"});
+
+  
+
+
+
+
+ return true; 
+}
+
+
 
 bool CostFunctionXYZ::outputAnalysis(const std::string& suffix, real* Astate)
 {
