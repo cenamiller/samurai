@@ -94,6 +94,7 @@ private:
 	bool initObCost3D();
 	bool gridDependentInit();
 	bool preProcessMetObs();
+	bool preProcessMetObs_thermo();
 	bool loadMetObs();
 	bool loadPreProcessMetObs();
 	bool loadBGfromFile();
